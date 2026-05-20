@@ -3,10 +3,12 @@ package initialize
 import (
 	"fmt"
 
-	"k8s.io/client-go/kubernetes"
 	"k8soperation/internal/app/requests"
 	"k8soperation/internal/app/services"
 	"k8soperation/pkg/app"
+
+	"go.uber.org/zap"
+	"k8s.io/client-go/kubernetes"
 )
 
 func SetupK8sBootstrap(a *app.App) error {
@@ -16,6 +18,7 @@ func SetupK8sBootstrap(a *app.App) error {
 		ID: a.AppSetting.DefaultClusterID,
 	})
 	if err != nil {
+		a.Logger.Error("K8sClusterInit failed", zap.Error(err))
 		return fmt.Errorf("K8sClusterInit failed: %w", err)
 	}
 

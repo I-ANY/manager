@@ -3,17 +3,18 @@ package services
 import (
 	"encoding/base64"
 	"fmt"
-	"go.uber.org/zap"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-	metricsclient "k8s.io/metrics/pkg/client/clientset/versioned"
 	"k8soperation/internal/app/models"
 	"k8soperation/internal/app/requests"
 	"k8soperation/internal/errorcode"
 	"os"
 	"strings"
 	"time"
+
+	"go.uber.org/zap"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	metricsclient "k8s.io/metrics/pkg/client/clientset/versioned"
 )
 
 func (s *Services) K8sClusterCreate(param *requests.K8sClusterCreateRequest) error {
@@ -73,7 +74,8 @@ func (s *Services) buildClients(cfg *rest.Config) (*K8sClients, error) {
 
 	kube, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("create kube client: %w", err)
+		s.App().Logger.Error("create kube client failed", zap.Error(err))
+		return nil, fmt.Errorf("create k8s client failed: %w", err)
 	}
 
 	// metrics 不作为硬依赖，失败仅告警
