@@ -6,6 +6,8 @@ require (
 	github.com/gin-contrib/sessions v1.0.4
 	github.com/gin-gonic/gin v1.11.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/google/uuid v1.6.0
+	github.com/pkg/errors v0.9.1
 	github.com/samber/lo v1.52.0
 	github.com/spf13/cast v1.7.1
 	github.com/spf13/cobra v1.10.2
@@ -66,7 +68,6 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/gomodule/redigo v1.9.2 // indirect
 	github.com/google/gnostic-models v0.7.1 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/context v1.1.2 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/gorilla/sessions v1.4.0 // indirect

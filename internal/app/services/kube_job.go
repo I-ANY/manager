@@ -15,7 +15,7 @@ func (s *Services) KubeJobCreate(ctx context.Context, req *requests.KubeJobCreat
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
-	jobObj, err := job.CreateJob(ctx, req)
+	jobObj, err := job.CreateJob(s.App().K8sClient(), ctx, req)
 	if err != nil {
 		if apierrors.IsAlreadyExists(err) {
 			s.App().Logger.Warnf("job %s/%s already exists", req.Namespace, req.Name)
@@ -30,25 +30,25 @@ func (s *Services) KubeJobCreate(ctx context.Context, req *requests.KubeJobCreat
 
 // listJob 列出 Job
 func (s *Services) KubeJobList(ctx context.Context, param *requests.KubeJobListRequest) ([]batchv1.Job, int, error) {
-	return job.GetJobList(ctx, param.Name, param.Namespace, param.Page, param.Limit)
+	return job.GetJobList(s.App().K8sClient(), ctx, param.Name, param.Namespace, param.Page, param.Limit)
 }
 
 // 获取 Job 详情
 func (s *Services) KubeJobDetail(ctx context.Context, param *requests.KubeJobDetailRequest) (*batchv1.Job, error) {
-	return job.GetJobDetail(ctx, param.Name, param.Namespace)
+	return job.GetJobDetail(s.App().K8sClient(), ctx, param.Name, param.Namespace)
 }
 
 // KubeJobDelete 删除 Job
 func (s *Services) KubeJobDelete(ctx context.Context, param *requests.KubeJobDeleteRequest) error {
-	return job.DeleteJob(ctx, param.Name, param.Namespace)
+	return job.DeleteJob(s.App().K8sClient(), ctx, param.Name, param.Namespace)
 }
 
 // KubeSuspendJob 控制 Job 暂停或恢复
 func (s *Services) KubeJobSuspend(ctx context.Context, param *requests.KubeJobSuspendRequest) error {
-	return job.SetJobSuspend(ctx, param.Namespace, param.Name, param.Suspend)
+	return job.SetJobSuspend(s.App().K8sClient(), ctx, param.Namespace, param.Name, param.Suspend)
 }
 
 // KubeJobRestart 重跑 Job（基于旧 Job 模板创建一个新名字的 Job）
 func (s *Services) KubeJobRestart(ctx context.Context, param *requests.KubeJobRestartRequest) (*batchv1.Job, error) {
-	return job.RestartJob(ctx, param.Namespace, param.Name)
+	return job.RestartJob(s.App().K8sClient(), ctx, param.Namespace, param.Name)
 }

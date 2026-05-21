@@ -25,7 +25,7 @@ func RollbackDeployment(client *k8s.Client, name, namespace, rsName string) (*ap
 		return nil, fmt.Errorf("get deployment %s/%s failed: %w", namespace, name, err)
 	}
 
-	replicaSets, err := GetDeploymentReplicaSet(namespace, name)
+	replicaSets, err := GetDeploymentReplicaSet(client, namespace, name)
 	if err != nil {
 		return nil, fmt.Errorf("list owned replicasets failed: %w", err)
 	}

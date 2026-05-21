@@ -2,15 +2,15 @@ package services
 
 import (
 	"context"
-	"k8soperation/pkg/k8s/crd"
 
-	appv1alpha1 "gitee.com/jay-kim/appconfig-operator/api/v1alpha1"
 	"k8soperation/internal/app/requests"
+	appv1alpha1 "k8soperation/pkg/apis/appconfig/v1alpha1"
+	"k8soperation/pkg/k8s/crd"
 )
 
 // 创建 AppConfig
 func (s *Services) KubeAppConfigCreate(ctx context.Context, req *requests.KubeAppConfigCreateRequest) (*appv1alpha1.AppConfig, error) {
-	app, err := crd.CreateAppConfig(ctx, req)
+	app, err := crd.CreateAppConfig(ctx, s.App(), req)
 	if err != nil {
 		s.App().Logger.Errorf("CreateAppConfig error: %v", err)
 		return nil, err
@@ -21,7 +21,7 @@ func (s *Services) KubeAppConfigCreate(ctx context.Context, req *requests.KubeAp
 
 // 更新 AppConfig
 func (s *Services) KubeAppConfigUpdate(ctx context.Context, req *requests.KubeAppConfigUpdateRequest) (*appv1alpha1.AppConfig, error) {
-	app, err := crd.UpdateAppConfig(ctx, req)
+	app, err := crd.UpdateAppConfig(ctx, s.App(), req)
 	if err != nil {
 		s.App().Logger.Errorf("UpdateAppConfig error: %v", err)
 		return nil, err
@@ -32,7 +32,7 @@ func (s *Services) KubeAppConfigUpdate(ctx context.Context, req *requests.KubeAp
 
 // 获取单个 AppConfig
 func (s *Services) KubeAppConfigGet(ctx context.Context, req *requests.KubeAppConfigNameRequest) (*appv1alpha1.AppConfig, error) {
-	app, err := crd.GetAppConfig(ctx, req)
+	app, err := crd.GetAppConfig(ctx, s.App(), req)
 	if err != nil {
 		s.App().Logger.Errorf("GetAppConfig error: %v", err)
 		return nil, err
@@ -43,7 +43,7 @@ func (s *Services) KubeAppConfigGet(ctx context.Context, req *requests.KubeAppCo
 
 // 删除 AppConfig
 func (s *Services) KubeAppConfigDelete(ctx context.Context, req *requests.KubeAppConfigNameRequest) error {
-	if err := crd.DeleteAppConfig(ctx, req); err != nil {
+	if err := crd.DeleteAppConfig(ctx, s.App(), req); err != nil {
 		s.App().Logger.Errorf("DeleteAppConfig error: %v", err)
 		return err
 	}
@@ -53,7 +53,7 @@ func (s *Services) KubeAppConfigDelete(ctx context.Context, req *requests.KubeAp
 
 // 列表 AppConfig
 func (s *Services) KubeAppConfigList(ctx context.Context, req *requests.KubeAppConfigListRequest) ([]appv1alpha1.AppConfig, error) {
-	items, err := crd.List(ctx, req)
+	items, err := crd.List(ctx, s.App(), req)
 	if err != nil {
 		s.App().Logger.Errorf("ListAppConfig error: %v", err)
 		return nil, err

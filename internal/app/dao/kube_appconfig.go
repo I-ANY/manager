@@ -3,8 +3,8 @@ package dao
 import (
 	"context"
 
-	appv1alpha1 "gitee.com/jay-kim/appconfig-operator/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/types"
+	appv1alpha1 "k8soperation/pkg/apis/appconfig/v1alpha1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 

@@ -2,13 +2,14 @@ package crd
 
 import (
 	"context"
-	appv1alpha1 "gitee.com/jay-kim/appconfig-operator/api/v1alpha1"
 	"k8soperation/internal/app/requests"
+	appv1alpha1 "k8soperation/pkg/apis/appconfig/v1alpha1"
+	"k8soperation/pkg/app"
 	"k8soperation/pkg/cluster"
 )
 
-func List(ctx context.Context, req *requests.KubeAppConfigListRequest) ([]appv1alpha1.AppConfig, error) {
-	cfg, err := cluster.GetRestConfig(ctx, req.ClusterID)
+func List(ctx context.Context, a *app.App, req *requests.KubeAppConfigListRequest) ([]appv1alpha1.AppConfig, error) {
+	cfg, err := cluster.GetRestConfig(ctx, a, req.ClusterID)
 	if err != nil {
 		return nil, err
 	}

@@ -12,7 +12,7 @@ import (
 
 func GetPodLog(client *k8s.Client, ctx context.Context, name, namespace, container string, tail int64, follow bool) (string, error) {
 	// 创建Pod日志选项，包括容器名称、行数限制和是否跟随日志
-	options := dataselect.NewPodLogOptions(container, tail, follow)
+	options := dataselect.NewPodLogOptions(client, container, tail, follow)
 
 	// 获取指定Pod的日志流
 	// 参数：命名空间、Pod名称和日志选项

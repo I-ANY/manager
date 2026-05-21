@@ -15,26 +15,26 @@ import (
 
 func (s *Services) KubeCreateSecret(ctx context.Context,
 	req *requests.KubeSecretCreateRequest) (*corev1.Secret, error) {
-	return secret.CreateSecret(ctx, req)
+	return secret.CreateSecret(s.App().K8sClient(), ctx, req)
 }
 
 // KubeSecretList 获取 Secret 列表（支持名称过滤 + 分页）
 func (s *Services) KubeSecretList(ctx context.Context, param *requests.KubeSecretListRequest) ([]corev1.Secret, int, error) {
-	return secret.GetSecretList(ctx, param.Name, param.Namespace, param.Page, param.Limit)
+	return secret.GetSecretList(s.App().K8sClient(), ctx, param.Name, param.Namespace, param.Page, param.Limit)
 }
 
 func (s *Services) KubeSecretDetail(ctx context.Context, param *requests.KubeSecretDetailRequest) (*corev1.Secret, error) {
-	return secret.GetSecretDetail(ctx, param.Name, param.Namespace)
+	return secret.GetSecretDetail(s.App().K8sClient(), ctx, param.Name, param.Namespace)
 }
 
 // 删除 Secret
 func (s *Services) KubeSecretDelete(ctx context.Context, param *requests.KubeSecretDeleteRequest) error {
-	return secret.DeleteSecret(ctx, param.Name, param.Namespace)
+	return secret.DeleteSecret(s.App().K8sClient(), ctx, param.Name, param.Namespace)
 }
 
 // Strategic Merge Patch（结构合并）
 func (s *Services) KubeSecretPatch(ctx context.Context, param *requests.KubeSecretUpdateRequest) (*corev1.Secret, error) {
-	return secret.PatchSecret(ctx, param.Namespace, param.Name, []byte(param.Content))
+	return secret.PatchSecret(s.App().K8sClient(), ctx, param.Namespace, param.Name, []byte(param.Content))
 }
 
 // JSON Merge Patch（覆盖式更新）
@@ -80,7 +80,7 @@ func (s *Services) KubeConfigMapPatch(
 	ctx context.Context,
 	param *requests.KubeConfigMapUpdateRequest,
 ) (*corev1.ConfigMap, error) {
-	return configmap.PatchConfigMap(ctx, param.Namespace, param.Name, []byte(param.Content))
+	return configmap.PatchConfigMap(s.App().K8sClient(), ctx, param.Namespace, param.Name, []byte(param.Content))
 }
 
 // JSON Merge Patch（覆盖式更新）

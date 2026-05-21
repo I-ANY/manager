@@ -2,14 +2,15 @@ package crd
 
 import (
 	"context"
-	appv1alpha1 "gitee.com/jay-kim/appconfig-operator/api/v1alpha1"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8soperation/internal/app/requests"
-	"k8soperation/internal/app/services"
+	appv1alpha1 "k8soperation/pkg/apis/appconfig/v1alpha1"
+	"k8soperation/pkg/app"
 )
 
-func CreateAppConfig(ctx context.Context, req *requests.KubeAppConfigCreateRequest) (*appv1alpha1.AppConfig, error) {
-	d, err := services.BuildAppConfig(ctx, req.ClusterID)
+func CreateAppConfig(ctx context.Context, a *app.App, req *requests.KubeAppConfigCreateRequest) (*appv1alpha1.AppConfig, error) {
+	d, err := BuildAppConfig(ctx, a, req.ClusterID)
 	if err != nil {
 		return nil, err
 	}

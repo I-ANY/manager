@@ -17,7 +17,7 @@ func (s *Services) KubeIngressCreate(ctx context.Context, req *requests.KubeIngr
 	c, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
-	ing, err := ingress.CreateIngress(c, req)
+	ing, err := ingress.CreateIngress(s.App().K8sClient(), c, req)
 	if err != nil {
 		if apierrors.IsAlreadyExists(err) {
 			s.App().Logger.Warnf("ingress %s/%s already exists", req.Namespace, req.Name)
@@ -31,16 +31,16 @@ func (s *Services) KubeIngressCreate(ctx context.Context, req *requests.KubeIngr
 }
 
 func (s *Services) KubeIngressList(ctx context.Context, param *requests.KubeIngressListRequest) ([]networkingv1.Ingress, int, error) {
-	return ingress.GetIngressList(ctx, param.Name, param.Namespace, param.Page, param.Limit)
+	return ingress.GetIngressList(s.App().K8sClient(), ctx, param.Name, param.Namespace, param.Page, param.Limit)
 }
 
 func (s *Services) KubeIngressDetail(ctx context.Context, param *requests.KubeIngressDetailRequest) (*networkingv1.Ingress, error) {
-	return ingress.GetIngressDetail(ctx, param.Name, param.Namespace)
+	return ingress.GetIngressDetail(s.App().K8sClient(), ctx, param.Name, param.Namespace)
 }
 
 // Strategic Merge Patch（结构合并）
 func (s *Services) KubeIngressPatch(ctx context.Context, param *requests.KubeIngressUpdateRequest) (*networkingv1.Ingress, error) {
-	return ingress.PatchIngress(ctx, param.Namespace, param.Name, []byte(param.Content))
+	return ingress.PatchIngress(s.App().K8sClient(), ctx, param.Namespace, param.Name, []byte(param.Content))
 }
 
 // JSON Merge Patch（覆盖式更新）
@@ -88,5 +88,5 @@ func (s *Services) KubeIngressPatchJSON(ctx context.Context, req *requests.KubeI
 
 // 删除 Ingress
 func (s *Services) KubeIngressDelete(ctx context.Context, param *requests.KubeIngressDeleteRequest) error {
-	return ingress.DeleteIngress(ctx, param.Name, param.Namespace)
+	return ingress.DeleteIngress(s.App().K8sClient(), ctx, param.Name, param.Namespace)
 }

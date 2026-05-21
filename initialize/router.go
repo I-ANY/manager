@@ -8,6 +8,7 @@ import (
 
 	_ "k8soperation/docs"
 	"k8soperation/internal/app/routers"
+	"k8soperation/internal/app/routers/kube_cluster"
 	"k8soperation/internal/app/routers/kube_configmap"
 	"k8soperation/internal/app/routers/kube_cronjob"
 	"k8soperation/internal/app/routers/kube_daemonset"
@@ -25,7 +26,6 @@ import (
 	"k8soperation/internal/app/routers/kube_storageclass"
 	"k8soperation/middlewares"
 	"k8soperation/pkg/app"
-	"k8soperation/pkg/k8s/k8s_cluster"
 )
 
 type injector interface {
@@ -64,7 +64,7 @@ func (s *Engine) injectRouterGroup(root *gin.RouterGroup, a *app.App) {
 	}
 
 	debug := v1.Group("")
-	debug.Use(middlewares.AuthJWT())
+	debug.Use(middlewares.AuthJWT(a))
 	debugRouters := []injector{
 		routers.NewDebugSessionRouter(),
 	}
@@ -75,7 +75,7 @@ func (s *Engine) injectRouterGroup(root *gin.RouterGroup, a *app.App) {
 	// k8s cluster routes
 	k8s := v1.Group("/k8s")
 	k8sRouters := []injector{
-		k8s_cluster.NewK8sRouter(),
+		kube_cluster.NewK8sRouter(),
 	}
 	for _, r := range k8sRouters {
 		r.Inject(k8s)

@@ -16,7 +16,7 @@ func (s *Services) KubeStatefulSetCreate(ctx context.Context, req *requests.Kube
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
-	sts, err := statefulset.CreateStatefulSet(ctx, req)
+	sts, err := statefulset.CreateStatefulSet(s.App().K8sClient(), ctx, req)
 	if err != nil {
 		if apierrors.IsAlreadyExists(err) {
 			return nil, fmt.Errorf("statefulset %q already exists in namespace %q", req.Name, req.Namespace)
@@ -40,7 +40,7 @@ func (s *Services) KubeStatefulSetCreateService(ctx context.Context,
 	defer cancel()
 
 	// 创建 StatefulSet
-	sts, err := statefulset.CreateStatefulSet(ctx, req)
+	sts, err := statefulset.CreateStatefulSet(s.App().K8sClient(), ctx, req)
 	if err != nil {
 		return nil, nil, fmt.Errorf("create statefulset failed: %w", err)
 	}
@@ -49,7 +49,7 @@ func (s *Services) KubeStatefulSetCreateService(ctx context.Context,
 	// 按需创建 Service
 	var svcObj *corev1.Service
 	if req.IsCreateService {
-		svcObj, err = statefulset.CreateServiceFromStatefulSet(ctx, req)
+		svcObj, err = statefulset.CreateServiceFromStatefulSet(s.App().K8sClient(), ctx, req)
 		if err != nil {
 			// 已存在直接复用
 			if apierrors.IsAlreadyExists(err) {
@@ -77,30 +77,30 @@ func (s *Services) KubeStatefulSetCreateService(ctx context.Context,
 }
 
 func (s *Services) KubeStatefulSetList(ctx context.Context, param *requests.KubeStatefulSetListRequest) ([]appv1.StatefulSet, int, error) {
-	return statefulset.GetSatefulSetList(ctx, param.Name, param.Namespace, param.Page, param.Limit)
+	return statefulset.GetSatefulSetList(s.App().K8sClient(), ctx, param.Name, param.Namespace, param.Page, param.Limit)
 }
 
 func (s *Services) KubeStatefulSetDetail(ctx context.Context, param *requests.KubeStatefulSetDetailRequest) (*appv1.StatefulSet, error) {
-	return statefulset.GetStatefulSetDetail(ctx, param.Namespace, param.Name)
+	return statefulset.GetStatefulSetDetail(s.App().K8sClient(), ctx, param.Namespace, param.Name)
 }
 
 func (s *Services) KubeStatefulSetPatchReplicas(ctx context.Context, param *requests.KubeStatefulSetScaleRequest) (*appv1.StatefulSet, error) {
-	return statefulset.PatchScaleReplicasStatefulSet(ctx, param.Namespace, param.Name, param.ScaleNum)
+	return statefulset.PatchScaleReplicasStatefulSet(s.App().K8sClient(), ctx, param.Namespace, param.Name, param.ScaleNum)
 }
 
 func (s *Services) KubeStatefulSetPatchImage(ctx context.Context, param *requests.KubeStatefulSetUpdateImageRequest) (*appv1.StatefulSet, error) {
-	return statefulset.PatchImageStatefulSet(ctx, param.Namespace, param.Name, param.Container, param.Image)
+	return statefulset.PatchImageStatefulSet(s.App().K8sClient(), ctx, param.Namespace, param.Name, param.Container, param.Image)
 }
 
 func (s *Services) KubeStatefulSetRestart(ctx context.Context, param *requests.KubeStatefulSetRestartRequest) (*appv1.StatefulSet, error) {
-	return statefulset.RestartStatefulSet(ctx, param.Namespace, param.Name)
+	return statefulset.RestartStatefulSet(s.App().K8sClient(), ctx, param.Namespace, param.Name)
 }
 
 func (s *Services) KubeStatefulSetDelete(ctx context.Context, param *requests.KubeStatefulSetDeleteRequest) error {
 	timeout := 30 * time.Second
-	return statefulset.DeleteStatefulSet(ctx, param.Namespace, param.Name, timeout)
+	return statefulset.DeleteStatefulSet(s.App().K8sClient(), ctx, param.Namespace, param.Name, timeout)
 }
 
 func (s *Services) KubeStatefulSetDeleteService(ctx context.Context, param *requests.KubeStatefulSetDeleteRequest) error {
-	return statefulset.DeleteStatefulSetService(ctx, param.Namespace, param.Name)
+	return statefulset.DeleteStatefulSetService(s.App().K8sClient(), ctx, param.Namespace, param.Name)
 }

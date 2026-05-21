@@ -16,7 +16,7 @@ import (
 
 // PodList 获取Pod列表
 func (s *Services) KubePodList(ctx context.Context, param *requests.KubePodListRequest) ([]corev1.Pod, error) {
-	pods, err := pod2.GetPodList(ctx, param.Name, param.Namespace, param.Page, param.Limit)
+	pods, err := pod2.GetPodList(s.App().K8sClient(), ctx, param.Name, param.Namespace, param.Page, param.Limit)
 	if err != nil {
 		s.App().Logger.Errorf("GetPodList error: %v", err)
 		return nil, err
@@ -70,7 +70,7 @@ func (s *Services) KubePodDelete(param *requests.KubePodDeleteRequest) error {
 
 // KubePodUpdate PodUpdate 更新Pod
 func (s *Services) KubePodUpdate(param *requests.KubePodUpdateRequest) error {
-	if err := pod2.UpdatePod(param.Namespace, param.Name, param.Content); err != nil {
+	if err := pod2.UpdatePod(s.App().K8sClient(), param.Namespace, param.Name, param.Content); err != nil {
 		s.App().Logger.Errorf("UpdatePod error: %v", err)
 		return err
 	}
@@ -123,7 +123,7 @@ func (s *Services) PatchPodImage(param *requests.PatchPodImageRequest) error {
 
 // KubePodDetail PodDetail 获取单个 Pod
 func (s *Services) KubePodDetail(param *requests.KubePodDetailRequest) (*corev1.Pod, error) {
-	p, err := pod2.GetPodDetail(param.Namespace, param.Name)
+	p, err := pod2.GetPodDetail(s.App().K8sClient(), param.Namespace, param.Name)
 	if err != nil {
 		s.App().Logger.Errorf("GetPodDetail error: %v", err)
 		return nil, err
@@ -135,7 +135,7 @@ func (s *Services) KubePodDetail(param *requests.KubePodDetailRequest) (*corev1.
 // GetContainerNames 获取容器名称列表
 func (s *Services) GetContainerNames(param *requests.KubePodDetailRequest) ([]string, error) {
 	// 先获取Pod详情
-	p, err := pod2.GetPodDetail(param.Namespace, param.Name)
+	p, err := pod2.GetPodDetail(s.App().K8sClient(), param.Namespace, param.Name)
 	if err != nil {
 		s.App().Logger.Errorf("GetPodDetail error: %v", err)
 		return nil, err
@@ -150,7 +150,7 @@ func (s *Services) GetContainerNames(param *requests.KubePodDetailRequest) ([]st
 // GetInitContainerNames 获取Init容器名称列表
 func (s *Services) GetInitContainerNames(param *requests.KubeCommonRequest) ([]string, error) {
 	// 先获取Pod详情
-	p, err := pod2.GetPodDetail(param.Namespace, param.Name)
+	p, err := pod2.GetPodDetail(s.App().K8sClient(), param.Namespace, param.Name)
 	if err != nil {
 		s.App().Logger.Errorf("GetPodDetail error: %v", err)
 		return nil, err
@@ -165,7 +165,7 @@ func (s *Services) GetInitContainerNames(param *requests.KubeCommonRequest) ([]s
 // GetContainerImages 获取容器镜像名称列表
 func (s *Services) GetContainerImages(param *requests.KubePodDetailRequest) ([]string, error) {
 	// 先获取Pod详情
-	p, err := pod2.GetPodDetail(param.Namespace, param.Name)
+	p, err := pod2.GetPodDetail(s.App().K8sClient(), param.Namespace, param.Name)
 	if err != nil {
 		s.App().Logger.Errorf("GetPodDetail error: %v", err)
 		return nil, err
@@ -180,7 +180,7 @@ func (s *Services) GetContainerImages(param *requests.KubePodDetailRequest) ([]s
 // GetInitContainerImages 获取Init容器镜像名称列表
 func (s *Services) GetInitContainerImages(param *requests.KubeCommonRequest) ([]string, error) {
 	// 先获取Pod详情
-	p, err := pod2.GetPodDetail(param.Namespace, param.Name)
+	p, err := pod2.GetPodDetail(s.App().K8sClient(), param.Namespace, param.Name)
 	if err != nil {
 		s.App().Logger.Errorf("GetPodDetail error: %v", err)
 		return nil, err
@@ -195,7 +195,7 @@ func (s *Services) GetInitContainerImages(param *requests.KubeCommonRequest) ([]
 // 获取所有容器名称（常规 + Init）
 func (s *Services) KubePodAllContainerNames(param *requests.KubePodDetailRequest) ([]string, error) {
 	// 1. 获取 Pod 对象
-	p, err := pod2.GetPodDetail(param.Namespace, param.Name)
+	p, err := pod2.GetPodDetail(s.App().K8sClient(), param.Namespace, param.Name)
 	if err != nil {
 		s.App().Logger.Errorf("GetPodDetail error: %v", err)
 		return nil, err
@@ -211,7 +211,7 @@ func (s *Services) KubePodAllContainerNames(param *requests.KubePodDetailRequest
 // 获取所有容器镜像（常规 + Init）
 func (s *Services) KubePodAllContainerImages(param *requests.KubePodDetailRequest) ([]string, error) {
 	// 1. 获取 Pod 对象
-	p, err := pod2.GetPodDetail(param.Namespace, param.Name)
+	p, err := pod2.GetPodDetail(s.App().K8sClient(), param.Namespace, param.Name)
 	if err != nil {
 		s.App().Logger.Errorf("GetPodDetail error: %v", err)
 		return nil, err

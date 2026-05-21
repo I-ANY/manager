@@ -1,9 +1,9 @@
 package cluster
 
 import (
-	"gitee.com/jay-kim/appconfig-operator/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
+	"k8soperation/pkg/apis/appconfig/v1alpha1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 

@@ -20,7 +20,7 @@ func (s *Services) KubeDaemonSetCreate(ctx context.Context, req *requests.KubeDa
 	defer cancel()
 
 	// 1) 创建 DaemonSet
-	ds, err := daemonset.CreateDaemonSet(ctx, req)
+	ds, err := daemonset.CreateDaemonSet(s.App().K8sClient(), ctx, req)
 	if err != nil {
 		return nil, nil, fmt.Errorf("create daemonset failed: %w", err)
 	}
@@ -28,7 +28,7 @@ func (s *Services) KubeDaemonSetCreate(ctx context.Context, req *requests.KubeDa
 	// 2) 按需创建 Service
 	var svcObj *corev1.Service
 	if req.IsCreateService {
-		svcObj, err = daemonset.CreateServiceFromDaemonSet(ctx, req)
+		svcObj, err = daemonset.CreateServiceFromDaemonSet(s.App().K8sClient(), ctx, req)
 		if err != nil {
 			if apierrors.IsAlreadyExists(err) {
 				svcName := strings.TrimSpace(req.ServiceName)
@@ -59,34 +59,34 @@ func (s *Services) KubeDaemonSetCreate(ctx context.Context, req *requests.KubeDa
 }
 
 func (s *Services) KubeDaemonSetList(ctx context.Context, param *requests.KubeDaemonSetListRequest) ([]appv1.DaemonSet, int, error) {
-	return daemonset.GetDaemonSetList(ctx, param.Name, param.Namespace, param.Page, param.Limit)
+	return daemonset.GetDaemonSetList(s.App().K8sClient(), ctx, param.Name, param.Namespace, param.Page, param.Limit)
 }
 
 func (s *Services) KubeDaemonSetDetail(ctx context.Context, param *requests.KubeDaemonSetDetailRequest) (*appv1.DaemonSet, error) {
-	return daemonset.GetDaemonSetDetail(ctx, param.Name, param.Namespace)
+	return daemonset.GetDaemonSetDetail(s.App().K8sClient(), ctx, param.Name, param.Namespace)
 }
 
 // 删除 DaemonSet
 func (s *Services) KubeDaemonSetDelete(ctx context.Context, param *requests.KubeDaemonSetDeleteRequest) error {
-	return daemonset.DeleteDaemonSet(ctx, param.Name, param.Namespace)
+	return daemonset.DeleteDaemonSet(s.App().K8sClient(), ctx, param.Name, param.Namespace)
 }
 
 // 删除 DaemonSet 对应的 Service（如果有）
 func (s *Services) KubeDaemonSetDeleteService(ctx context.Context, param *requests.KubeDaemonSetDeleteRequest) error {
-	return daemonset.DeleteDaemonSetService(ctx, param.Name, param.Namespace)
+	return daemonset.DeleteDaemonSetService(s.App().K8sClient(), ctx, param.Name, param.Namespace)
 }
 
 // 更新 DaemonSet 的镜像
 func (s *Services) KubeDaemonSetUpdateImage(ctx context.Context, param *requests.KubeDaemonSetUpdateImageRequest) (*appv1.DaemonSet, error) {
-	return daemonset.PatchUpdateDaemonSetImage(ctx, param.Namespace, param.Name, param.Container, param.Image)
+	return daemonset.PatchUpdateDaemonSetImage(s.App().K8sClient(), ctx, param.Namespace, param.Name, param.Container, param.Image)
 }
 
 // 重启 DaemonSet
 func (s *Services) KubeDaemonSetRestart(ctx context.Context, param *requests.KubeDaemonSetRestartRequest) error {
-	return daemonset.RestartDaemonSet(ctx, param.Namespace, param.Name)
+	return daemonset.RestartDaemonSet(s.App().K8sClient(), ctx, param.Namespace, param.Name)
 }
 
 // 回滚到指定版本
 func (s *Services) KubeDaemonSetRollback(ctx context.Context, param *requests.KubeDaemonSetRollbackRequest) (*appv1.DaemonSet, error) {
-	return daemonset.RollbackDaemonSet(ctx, param.Name, param.Namespace, param.RevisionName)
+	return daemonset.RollbackDaemonSet(s.App().K8sClient(), ctx, param.Name, param.Namespace, param.RevisionName)
 }

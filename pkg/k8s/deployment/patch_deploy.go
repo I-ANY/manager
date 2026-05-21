@@ -30,7 +30,7 @@ func PatchDeploymentReplicas(client *k8s.Client, ctx context.Context, namespace,
 	if err != nil {
 		return nil, err
 	}
-	return PatchDeployment(ctx, namespace, name, patchReplicas)
+	return PatchDeployment(client, ctx, namespace, name, patchReplicas)
 }
 
 // PatchDeploymentImage 修改容器镜像
@@ -39,5 +39,5 @@ func PatchDeploymentImage(client *k8s.Client, ctx context.Context, namespace, na
 	if err != nil {
 		return nil, err
 	}
-	return PatchDeployment(ctx, namespace, name, patchImage)
+	return PatchDeployment(client, ctx, namespace, name, patchImage)
 }

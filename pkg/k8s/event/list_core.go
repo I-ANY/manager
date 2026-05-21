@@ -3,9 +3,9 @@ package event
 import (
 	"context"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8soperation/global"
 	"k8soperation/internal/app/models"
 	"k8soperation/internal/app/requests"
+	"k8soperation/pkg/k8s"
 	"k8soperation/pkg/utils"
 )
 

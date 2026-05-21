@@ -19,48 +19,48 @@ import (
 
 // 列表
 func (s *Services) KubeDeploymentList(ctx context.Context, param *requests.KubeDeploymentListRequest) ([]appv1.Deployment, int, error) {
-	return deployment.GetDeploymentList(ctx, param.Name, param.Namespace, param.Page, param.Limit)
+	return deployment.GetDeploymentList(s.App().K8sClient(), ctx, param.Name, param.Namespace, param.Page, param.Limit)
 }
 
 // 删除
 func (s *Services) KubeDeploymentDelete(ctx context.Context, param *requests.KubeDeploymentDeleteRequest) error {
-	return deployment.DeleteDeployment(ctx, param.Name, param.Namespace)
+	return deployment.DeleteDeployment(s.App().K8sClient(), ctx, param.Name, param.Namespace)
 }
 
 // 删除 Service
 func (s *Services) KubeDeploymentDeleteService(ctx context.Context, param *requests.KubeDeploymentDeleteRequest) error {
-	return deployment.DeleteService(ctx, param.Name, param.Namespace)
+	return deployment.DeleteService(s.App().K8sClient(), ctx, param.Name, param.Namespace)
 }
 
 // 扩缩容（改副本数）
 func (s *Services) KubeUpdateDeploymentReplicas(ctx context.Context, param *requests.KubeDeploymentScaleRequest) (*appv1.Deployment, error) {
-	return deployment.PatchDeploymentReplicas(ctx, param.Namespace, param.Name, param.ScaleNum)
+	return deployment.PatchDeploymentReplicas(s.App().K8sClient(), ctx, param.Namespace, param.Name, param.ScaleNum)
 }
 
 // 更新镜像
 func (s *Services) KubeUpdateDeploymentImage(ctx context.Context, param *requests.KubeDeploymentUpdateImageRequest) (*appv1.Deployment, error) {
-	return deployment.PatchDeploymentImage(ctx, param.Namespace, param.Name, param.Container, param.Image)
+	return deployment.PatchDeploymentImage(s.App().K8sClient(), ctx, param.Namespace, param.Name, param.Container, param.Image)
 }
 
 // Patch 模板（content 一般是 JSON Patch / StrategicMergePatch）
 // 如果你传的是字符串，转成 []byte 再下发
 func (s *Services) KubeUpdateDeploymentTemplate(ctx context.Context, param *requests.KubeDeploymentUpdateRequest) (*appv1.Deployment, error) {
-	return deployment.PatchDeployment(ctx, param.Namespace, param.Name, []byte(param.Content))
+	return deployment.PatchDeployment(s.App().K8sClient(), ctx, param.Namespace, param.Name, []byte(param.Content))
 }
 
 // 回滚到指定 RS —— 和你的 DTO 对应
 func (s *Services) KubeDeploymentRollback(ctx context.Context, param *requests.KubeDeploymentRollbackRequest) (*appv1.Deployment, error) {
-	return deployment.RollbackDeployment(param.Name, param.Namespace, param.ReplicaSet)
+	return deployment.RollbackDeployment(s.App().K8sClient(), param.Name, param.Namespace, param.ReplicaSet)
 }
 
 // 重启 Deployment
 func (s *Services) KubeDeploymentRestart(ctx context.Context, param *requests.KubeDeploymentRestartRequest) error {
-	return deployment.RestartDeployment(param.Namespace, param.Name)
+	return deployment.RestartDeployment(s.App().K8sClient(), param.Namespace, param.Name)
 }
 
 // 获取 Deployment 详情
 func (s *Services) KubeDeploymentDetail(ctx context.Context, param *requests.KubeDeploymentDetailRequest) (*appv1.Deployment, error) {
-	return deployment.GetDeploymentDetail(param.Name, param.Namespace)
+	return deployment.GetDeploymentDetail(s.App().K8sClient(), param.Name, param.Namespace)
 }
 
 // 创建 Deployment
@@ -70,7 +70,7 @@ func (s *Services) KubeDeploymentCreate(ctx context.Context, req *requests.KubeD
 	defer cancel()
 
 	// 1) 创建 Deployment
-	dp, err := deployment.CreateDeployment(ctx, req)
+	dp, err := deployment.CreateDeployment(s.App().K8sClient(), ctx, req)
 	if err != nil {
 		// 用 %w 包装，便于上层中间件用 errors.Is / apierrors.* 继续识别
 		return nil, nil, fmt.Errorf("create deployment failed: %w", err)
@@ -79,7 +79,7 @@ func (s *Services) KubeDeploymentCreate(ctx context.Context, req *requests.KubeD
 	// 2) 按需创建 Service
 	var svcObj *corev1.Service
 	if req.IsCreateService {
-		svcObj, err = deployment.CreateServiceFromDeployment(ctx, req)
+		svcObj, err = deployment.CreateServiceFromDeployment(s.App().K8sClient(), ctx, req)
 		if err != nil {
 			if apierrors.IsAlreadyExists(err) {
 				svcName := strings.TrimSpace(req.ServiceName)
@@ -112,10 +112,10 @@ func (s *Services) KubeDeploymentCreate(ctx context.Context, req *requests.KubeD
 
 // 获取 Deployment 对应的 Pod 列表（原始 Pod 对象）
 func (s *Services) KubeDeploymentGetPod(ctx context.Context, param *requests.KubeCommonRequest) ([]corev1.Pod, error) {
-	return deployment.GetPodByDeployment(ctx, param.Namespace, param.Name)
+	return deployment.GetPodByDeployment(s.App().K8sClient(), ctx, param.Namespace, param.Name)
 }
 
 // 获取 Deployment 对应的 事件
 func (s *Services) KubeEventList(ctx context.Context, param *requests.KubeEventListRequest) ([]models.EventItem, string, error) {
-	return event.ListEvents(ctx, param)
+	return event.ListEvents(s.App().K8sClient(), ctx, param)
 }
