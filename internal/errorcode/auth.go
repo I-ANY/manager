@@ -8,7 +8,7 @@ var (
 )
 
 func registerAuth() {
-	Unauthorized = NewError(200001, "未认证或认证失效")
-	PermissionDenied = NewError(200002, "无权限执行该操作")
-	UserFrozenOrDisabled = NewError(200003, "用户状态异常")
+	Unauthorized = NewError(2001, "未认证或认证失效")
+	PermissionDenied = NewError(2002, "无权限执行该操作")
+	UserFrozenOrDisabled = NewError(2003, "用户状态异常")
 }

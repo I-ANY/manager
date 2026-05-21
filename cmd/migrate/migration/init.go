@@ -114,14 +114,9 @@ func runOne(db *gorm.DB, item entry) error {
 		if err := item.handler(tx); err != nil {
 			return fmt.Errorf("run migration %s failed: %w", item.version, err)
 		}
-		name := item.name
-		if name == "" {
-			name = item.version
-		}
 		record := models.Migration{
 			Version:   item.version,
-			Name:      name,
-			CreatedAt: uint32(time.Now().Unix()),
+			ApplyTime: uint32(time.Now().Unix()),
 		}
 		if err := tx.Create(&record).Error; err != nil {
 			return fmt.Errorf("record migration %s failed: %w", item.version, err)

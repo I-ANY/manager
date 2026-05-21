@@ -7,3 +7,7 @@ type LoginSessionInfo struct {
 	Token     string    `json:"token"`
 	LoginTime time.Time `json:"login_time"`
 }
+
+func (u *LoginSessionInfo) TableName() string {
+	return "login_session_info"
+}

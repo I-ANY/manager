@@ -4,15 +4,16 @@ import (
 	"fmt"
 	"net/http"
 
+	"k8soperation/pkg/app"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/redis"
-	"k8soperation/pkg/app"
 )
 
 func SetupSession(a *app.App) error {
-	if a.CacheSetting.Username == "" {
-		return fmt.Errorf("redis username is empty")
-	}
+	//if a.CacheSetting.Username == "" {
+	//	return fmt.Errorf("redis username is empty")
+	//}
 
 	store, err := redis.NewStore(
 		a.CacheSetting.MaxConnect,

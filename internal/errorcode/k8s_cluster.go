@@ -12,12 +12,12 @@ var (
 )
 
 func registerCluster() {
-	ErrorClusterNotFound = NewError(200001, "集群名字不存在")
-	ErrorClusterUnhealthy = NewError(200002, "集群不可用")
-	ErrorClusterForbidden = NewError(200003, "没有访问该集群的权限")
-	ErrorClusterInitFailed = NewError(200004, "K8s 集群初始化失败")
+	ErrorClusterNotFound = NewError(5001, "集群名字不存在")
+	ErrorClusterUnhealthy = NewError(5002, "集群不可用")
+	ErrorClusterForbidden = NewError(5003, "没有访问该集群的权限")
+	ErrorClusterInitFailed = NewError(5004, "K8s 集群初始化失败")
 
-	ErrorClusterDeleteFail = NewError(200005, "删除集群失败")
-	ErrorClusterUpdateFail = NewError(200006, "更新集群失败")
-	ErrorClusterQueryFail = NewError(200007, "查询集群失败")
+	ErrorClusterDeleteFail = NewError(5005, "删除集群失败")
+	ErrorClusterUpdateFail = NewError(5006, "更新集群失败")
+	ErrorClusterQueryFail = NewError(5007, "查询集群失败")
 }

@@ -1,24 +1,25 @@
 package models
 
 import (
-	"gorm.io/gorm"
 	"k8soperation/internal/errorcode"
 	"strconv"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type User struct {
 	Username string `json:"username" description:"用户名"`
-	Password string `json:"-" description:"密码"`
+	Password string `json:"password" description:"密码"`
 	*Base
-}
-
-func NewUser() *User {
-	return &User{}
 }
 
 func (u *User) TableName() string {
 	return "user"
+}
+
+func NewUser() *User {
+	return &User{}
 }
 
 func (u *User) Create(db *gorm.DB) error {

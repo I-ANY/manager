@@ -4,10 +4,9 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"k8soperation/pkg/utils"
 	"os"
 	"path/filepath"
-	"regexp"
-	"strings"
 	"text/template"
 	"time"
 
@@ -19,63 +18,17 @@ import (
 	"k8soperation/pkg/setting"
 	"k8soperation/pkg/setting/types"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	gormlogger "gorm.io/gorm/logger"
 )
 
-var migrationTemplate = template.Must(template.New("migration").Parse(`package {{.Package}}
-
-import (
-	"gorm.io/gorm"
-	"runtime"
-	"k8s-manager/cmd/migrate/migration"
-
-)
-
-func init() {
-	_, fileName, _, _ := runtime.Caller(0)
-	migration.Migrate.SetVersion(migration.GetFilename(fileName), _{{.GenerateTime}}Test)
-}
-
-func _{{.GenerateTime}}Test(db *gorm.DB, version string) error {
-	return db.Transaction(func(tx *gorm.DB) error {
-		var err error
-		
-	    // TODO: 这里开始写入要变更的内容
-
-	    // TODO: 例如 修改表字段 使用过程中请删除此段代码
-		//err := tx.Migrator().RenameColumn(&models.SysConfig{}, "config_id", "id")
-		//if err != nil {
-		// 	return err
-		//}
-
-		// TODO: 例如 新增表结构 使用过程中请删除此段代码
-		//err = tx.Debug().Migrator().AutoMigrate(
-        //		new(models.CasbinRule),
-        // 		)
-        //if err != nil {
-        // 	return err
-        //}
-
-
-		return tx.Create(&pkgmodels.Migration{
-			Version: version,
-		}).Error
-	})
-}
-`))
-
-type templateData struct {
-	Version    string
-	Name       string
-	ConstName  string
-	FuncSuffix string
-}
+const migrationTemplatePath = "template/migrate.template"
 
 func NewCommand(configFile *string) *cobra.Command {
-	var generateName string
+	var generate bool
 
 	cmd := &cobra.Command{
 		Use:          "migrate",
@@ -84,8 +37,8 @@ func NewCommand(configFile *string) *cobra.Command {
 		Example:      "k8s-manager migrate -c configs/config.yaml",
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if generateName != "" {
-				path, err := generateFile(generateName)
+			if generate {
+				path, err := generateFile()
 				if err != nil {
 					return err
 				}
@@ -95,7 +48,7 @@ func NewCommand(configFile *string) *cobra.Command {
 			return run(configValue(configFile))
 		},
 	}
-	cmd.Flags().StringVarP(&generateName, "generate", "g", "", "Generate migration file with the provided name")
+	cmd.Flags().BoolVarP(&generate, "generate", "g", false, "Generate migration file")
 	return cmd
 }
 
@@ -237,38 +190,30 @@ func setupDB(a *app.App) error {
 	return nil
 }
 
-func generateFile(name string) (string, error) {
-	name = normalizeName(name)
-	if name == "" {
-		return "", fmt.Errorf("migration name is empty")
-	}
-
+func generateFile() (string, error) {
 	version := time.Now().Format("20060102150405")
-	data := templateData{
-		Version:    version,
-		Name:       name,
-		ConstName:  "migration" + version,
-		FuncSuffix: version,
-	}
-
-	var buf bytes.Buffer
-	if err := migrationTemplate.Execute(&buf, data); err != nil {
-		return "", err
+	t1, err := template.ParseFiles(migrationTemplatePath)
+	if err != nil {
+		return "", fmt.Errorf("read migration template failed: %w", err)
 	}
 
 	dir := filepath.Join("cmd", "migrate", "migration", "version")
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return "", fmt.Errorf("create migration version dir failed: %w", err)
 	}
-	path := filepath.Join(dir, fmt.Sprintf("%s_%s.go", version, name))
-	if err := os.WriteFile(path, buf.Bytes(), 0o644); err != nil {
-		return "", fmt.Errorf("write migration file failed: %w", err)
+	path := filepath.Join(dir, fmt.Sprintf("%s_migrate.go", version))
+
+	m := map[string]string{}
+	m["Package"] = "version"
+	m["Module"] = "admin"
+	var b1 bytes.Buffer
+	err = t1.Execute(&b1, m)
+	if err != nil {
+		return "", errors.WithStack(err)
+	}
+	err = utils.Create(b1, path)
+	if err != nil {
+		return "", errors.WithStack(err)
 	}
 	return path, nil
-}
-
-func normalizeName(name string) string {
-	name = strings.ToLower(strings.TrimSpace(name))
-	name = regexp.MustCompile(`[^a-z0-9]+`).ReplaceAllString(name, "_")
-	return strings.Trim(name, "_")
 }

@@ -7,6 +7,6 @@ var (
 )
 
 func registerQuota() {
-	RateLimited = NewError(500001, "已触发限流/频控")
-	QuotaExceeded = NewError(500002, "配额已用尽")
+	RateLimited = NewError(1001, "已触发限流/频控")
+	QuotaExceeded = NewError(1002, "配额已用尽")
 }

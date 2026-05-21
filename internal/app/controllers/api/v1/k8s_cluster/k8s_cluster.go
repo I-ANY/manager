@@ -179,6 +179,7 @@ func (c *K8sClusterController) Init(ctx *gin.Context) {
 	a.KubeClient = cli.Kube
 	// a.MetricsClient 用于存储Metrics客户端实例，用于获取Kubernetes集群的指标数据
 	a.MetricsClient = cli.Metrics
+	a.SupportsEventsV1 = cli.SupportsEvV1
 
 	rsp.Success(gin.H{
 		"message":  "初始化K8s集群成功",

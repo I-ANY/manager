@@ -28,3 +28,7 @@ type NodeMetricItem struct {
 	// json:"mem_usage_percent,omitempty" 表示在JSON序列化时使用该字段名，omitempty表示当字段值为空时省略该字段
 	MemUsagePercent float64 `json:"mem_usage_percent,omitempty"`
 }
+
+func (n *NodeMetricItem) TableName() string {
+	return "node_metric_item"
+}

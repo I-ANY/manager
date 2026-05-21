@@ -28,12 +28,6 @@ func InitAll(configFile string) (*app.App, error) {
 	if err := initialize.SetupSession(a); err != nil {
 		return nil, err
 	}
-	if err := initialize.SetupK8sBootstrap(a); err != nil {
-		return nil, err
-	}
-	if err := initialize.SetupAppConfigClient(a); err != nil {
-		return nil, err
-	}
 
 	initialize.LogDocsReady(a)
 

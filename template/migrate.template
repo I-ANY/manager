@@ -1,0 +1,52 @@
+package version
+
+import (
+	"runtime"
+    "k8soperation/internal/app/models"
+	"k8soperation/cmd/migrate/migration"
+
+	"gorm.io/gorm"
+)
+
+func init() {
+	_, fileName, _, _ := runtime.Caller(0)
+	migration.RegisterNamed(migration.VersionFromFilename(fileName), "migrate", func(tx *gorm.DB) error {
+		// ============================================================
+		// 在这里编写本次数据库变更逻辑。
+		//
+		// 注意事项：
+		// 1. 当前函数已经运行在事务中，不需要再手动开启 tx.Transaction。
+		// 2. 返回 error 时，本次迁移会回滚，并且不会写入 sys_migration。
+		// 3. 执行成功后，框架会自动写入 sys_migration(version, apply_time)。
+		// 4. 下方示例代码仅用于参考，使用时请删除不需要的示例。
+		// ============================================================
+
+		// 示例一：修改表字段
+		// 如果需要使用 models，请在 import 中添加：
+		// "k8soperation/internal/app/models"
+		//
+		// err := tx.Migrator().RenameColumn(&models.SysConfig{}, "config_id", "id")
+		// if err != nil {
+		// 	return err
+		// }
+
+		// 示例二：新增或同步表结构
+		// 如果需要使用 models，请在 import 中添加：
+		// "k8soperation/internal/app/models"
+		//
+		// err := tx.Debug().Migrator().AutoMigrate(
+		// 	new(models.CasbinRule),
+		// )
+		// if err != nil {
+		// 	return err
+		// }
+
+		// 示例三：执行原生 SQL
+		// err := tx.Exec("ALTER TABLE sys_config ADD COLUMN remark varchar(255) DEFAULT ''").Error
+		// if err != nil {
+		// 	return err
+		// }
+
+		return nil
+	})
+}

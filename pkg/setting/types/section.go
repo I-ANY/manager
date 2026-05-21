@@ -5,12 +5,12 @@ import (
 )
 
 type AppConfig struct {
-	ServerSetting   *ServerSettingS
-	AppSetting      *AppSettingS
-	DatabaseSetting *DatabaseSettingS
-	CacheSetting    *CacheSettingS
-	PodLogSetting   *PodLogSetting
-	NodeSetting     *NodeConfig
+	ServerSetting   *ServerSettingS   `mapstructure:"Server"`
+	AppSetting      *AppSettingS      `mapstructure:"App"`
+	DatabaseSetting *DatabaseSettingS `mapstructure:"Database"`
+	CacheSetting    *CacheSettingS    `mapstructure:"Cache"`
+	PodLogSetting   *PodLogSetting    `mapstructure:"PodLog"`
+	NodeSetting     *NodeConfig       `mapstructure:"Node"`
 }
 
 type ServerSettingS struct {
